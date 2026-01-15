@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Jammed Pump Clock</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>HARDCORE FROG CLOCK</h1>
+        <p>Warning: Pump gets JAMMED! Click fast to fix.</p>
+    </header>
+
+    <div class="main-wrapper">
+        
+        <div class="panel" id="clock-panel">
+            
+            <div class="frog-clock-container">
+                <div class="frog-eye left-eye"></div>
+                <div class="frog-eye right-eye"></div>
+                <div class="frog-face">
+                    <div class="marker twelve">12</div>
+                    <div class="marker three">3</div>
+                    <div class="marker six">6</div>
+                    <div class="marker nine">9</div>
+                    <div class="hand hour" id="h-hand"></div>
+                    <div class="hand minute" id="m-hand"></div>
+                    <div class="center-dot"></div>
+                    <div class="mouth-smile"></div>
+                </div>
+            </div>
+
+            <div class="status-panel">
+                <div class="label">TIME PRESSURE</div>
+                <div class="digital-time">
+                    <span id="d-time">12:00</span> <span id="am-pm">AM</span>
+                </div>
+            </div>
+
+            <div class="controls-row">
+                <div class="pump-container">
+                    <div id="pump-indicator">OK</div> <div class="pump-mechanism">
+                        <div id="pump-handle" onclick="pumpTime()">
+                            <div class="handle-grip">PUMP</div>
+                            <div class="piston-shaft"></div>
+                        </div>
+                        <div class="pump-body"></div>
+                    </div>
+                </div>
+
+                <button id="freeze-btn" onclick="freezeTime()">
+                    ❄ FREEZE ❄<br>(5s)
+                </button>
+            </div>
+        </div>
+
+        <div class="panel frog-panel" id="volume-panel">
+            <div class="display-screen">
+                <div class="label">VOLUME</div>
+                <div class="bar-container"><div id="vol-bar"></div></div>
+                <div id="vol-status">LOUD!</div>
+            </div>
+
+            <div class="pond-container" id="pond">
+                <div class="water-level"></div>
+                <div id="vol-frog">
+                    <div class="v-eyes"><div class="v-eye"></div><div class="v-eye"></div></div>
+                    <div class="v-body"></div>
+                </div>
+            </div>
+            <p class="instruction">DROWN FROG TO MUTE</p>
+        </div>
+
+    </div>
+
+    <div class="lock-section">
+        <div id="slider-track">
+            <div id="slider-text">FREEZE & DROWN TO LOCK ➜</div>
+            <div id="slider-knob">🔒</div>
+        </div>
+        <div id="status-msg"></div>
+    </div>
+
+    <div id="stabilizer-overlay">
+        <h1 class="shake-text">WAKE UP!</h1>
+        <div id="safe-zone"></div>
+        <div id="fake-cursor"></div>
+        <div class="stab-msg">HOLD DOT (5s) <br> (Controls Inverted)</div>
+        <div class="progress-box"><div id="stop-progress"></div></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
