@@ -376,3 +376,4 @@ function runStabilizer(clientX, clientY) {
         location.reload();
     }
 }
+
