@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Jammed Pump Clock</title>
+    <title>Cute Frog Alarm</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>HARDCORE FROG CLOCK</h1>
-        <p>Warning: Pump gets JAMMED! Click fast to fix.</p>
+        <h1>FROGGY ALARM 🐸</h1>
+        <p>Pump Time -> Freeze -> Drown Frog -> Lock</p>
     </header>
 
     <div class="main-wrapper">
@@ -18,17 +18,24 @@
         <div class="panel" id="clock-panel">
             
             <div class="frog-clock-container">
-                <div class="frog-eye left-eye"></div>
-                <div class="frog-eye right-eye"></div>
-                <div class="frog-face">
-                    <div class="marker twelve">12</div>
-                    <div class="marker three">3</div>
-                    <div class="marker six">6</div>
-                    <div class="marker nine">9</div>
-                    <div class="hand hour" id="h-hand"></div>
-                    <div class="hand minute" id="m-hand"></div>
-                    <div class="center-dot"></div>
-                    <div class="mouth-smile"></div>
+                <div class="frog-body-shape">
+                    <div class="frog-eyes">
+                        <div class="eye left"><div class="pupil"></div></div>
+                        <div class="eye right"><div class="pupil"></div></div>
+                    </div>
+                    <div class="frog-belly"></div>
+                    <div class="frog-legs"></div>
+                    
+                    <div class="clock-face">
+                        <div class="marker twelve">12</div>
+                        <div class="marker three">3</div>
+                        <div class="marker six">6</div>
+                        <div class="marker nine">9</div>
+                        <div class="hand hour" id="h-hand"></div>
+                        <div class="hand minute" id="m-hand"></div>
+                        <div class="center-dot"></div>
+                    </div>
+                    <div class="mouth"></div>
                 </div>
             </div>
 
@@ -41,8 +48,9 @@
 
             <div class="controls-row">
                 <div class="pump-container">
-                    <div id="pump-indicator">OK</div> <div class="pump-mechanism">
-                        <div id="pump-handle" onclick="pumpTime()">
+                    <div id="pump-indicator">OK</div>
+                    <div class="pump-mechanism">
+                        <div id="pump-handle">
                             <div class="handle-grip">PUMP</div>
                             <div class="piston-shaft"></div>
                         </div>
@@ -51,33 +59,43 @@
                 </div>
 
                 <button id="freeze-btn" onclick="freezeTime()">
-                    ❄ FREEZE ❄<br>(5s)
+                    ❄ FREEZE ❄
                 </button>
             </div>
         </div>
 
         <div class="panel frog-panel" id="volume-panel">
             <div class="display-screen">
-                <div class="label">VOLUME</div>
+                <div class="label">FROG VOLUME</div>
                 <div class="bar-container"><div id="vol-bar"></div></div>
                 <div id="vol-status">LOUD!</div>
             </div>
 
             <div class="pond-container" id="pond">
                 <div class="water-level"></div>
+                
                 <div id="vol-frog">
-                    <div class="v-eyes"><div class="v-eye"></div><div class="v-eye"></div></div>
-                    <div class="v-body"></div>
+                    <div class="mini-eyes">
+                        <div class="mini-eye"></div>
+                        <div class="mini-eye"></div>
+                    </div>
+                    <div class="mini-belly"></div>
+                    <div class="mini-legs"></div>
+                </div>
+                
+                <div class="pond-depth-markers">
+                    <span>LOUD</span>
+                    <span>MUTE</span>
                 </div>
             </div>
-            <p class="instruction">DROWN FROG TO MUTE</p>
+            <p class="instruction">DRAG HIM DOWN!</p>
         </div>
 
     </div>
 
     <div class="lock-section">
         <div id="slider-track">
-            <div id="slider-text">FREEZE & DROWN TO LOCK ➜</div>
+            <div id="slider-text">SWIPE TO LOCK ➜</div>
             <div id="slider-knob">🔒</div>
         </div>
         <div id="status-msg"></div>
@@ -87,7 +105,7 @@
         <h1 class="shake-text">WAKE UP!</h1>
         <div id="safe-zone"></div>
         <div id="fake-cursor"></div>
-        <div class="stab-msg">HOLD DOT (5s) <br> (Controls Inverted)</div>
+        <div class="stab-msg">HOLD DOT IN CIRCLE (5s)</div>
         <div class="progress-box"><div id="stop-progress"></div></div>
     </div>
 
