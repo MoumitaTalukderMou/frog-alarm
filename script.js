@@ -353,7 +353,6 @@ function setupNextAd() {
     
     const closeBtn = document.querySelector('.close-ad');
     const popup = document.getElementById('current-ad');
-    
     if(closeBtn.parentNode !== popup) popup.appendChild(closeBtn);
     
     closeBtn.classList.remove('running-mode'); 

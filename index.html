@@ -1,16 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Froggy Alarm: Worst Edition</title>
+    <title>Froggy Alarm: CHAOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <button onclick="triggerAlarm()" style="position: fixed; top: 10px; left: 10px; z-index: 2000; padding: 10px; background: red; color: white; border: 2px solid white; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        🚨 TEST
+        🚨 TEST CHAOS
     </button>
 
     <header>
@@ -92,11 +91,13 @@
     </div>
 
     <div id="stabilizer-overlay">
-        <h1 class="shake-text">WAKE UP!</h1>
-        <div id="stab-timer">15</div>
+        <h1 class="shake-text visible-box">WAKE UP!</h1>
+        <div id="stab-timer" class="visible-box">15</div>
+        
         <div id="safe-zone"></div>
         <div id="fake-cursor"></div>
-        <div class="stab-msg">HOLD DOT IN CIRCLE (WIN = NO ADS)</div>
+        
+        <div class="stab-msg visible-box">HOLD DOT IN CIRCLE</div>
         <div class="progress-box"><div id="stop-progress"></div></div>
     </div>
 
@@ -110,7 +111,7 @@
                     <button class="ad-claim">CLAIM NOW</button>
                 </div>
             </div>
-            <p id="ad-count">Ads remaining: 5</p>
+            <p id="ad-count" class="visible-box">Ads remaining: 5</p>
         </div>
     </div>
 
