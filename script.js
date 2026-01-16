@@ -46,7 +46,6 @@ const sliderTrack = document.getElementById('slider-track');
 const statusMsg = document.getElementById('status-msg');
 const hHand = document.getElementById('h-hand');
 const mHand = document.getElementById('m-hand');
-// Overlay Elements
 const safeZone = document.getElementById('safe-zone');
 const fakeCursor = document.getElementById('fake-cursor');
 const progressBar = document.getElementById('stop-progress');
@@ -74,8 +73,6 @@ setInterval(() => {
 function pumpTime(e) {
     initAudio();
     if(isLocked) return;
-    const pumpInd = document.getElementById('pump-indicator');
-    
     if(isJammed) {
         jamClicksRemaining--;
         pumpHandle.classList.add('pump-shake');
@@ -83,9 +80,9 @@ function pumpTime(e) {
         if(jamClicksRemaining <= 0) {
             isJammed = false;
             pumpHandle.parentElement.classList.remove('pump-jammed');
-            pumpInd.innerText = "OK";
-            pumpInd.style.color = "#0f0";
-            pumpInd.style.background = "transparent";
+            document.getElementById('pump-indicator').innerText = "OK";
+            document.getElementById('pump-indicator').style.color = "#0f0";
+            document.getElementById('pump-indicator').style.background = "transparent";
         }
         return;
     }
@@ -93,9 +90,9 @@ function pumpTime(e) {
         isJammed = true;
         jamClicksRemaining = 4;
         pumpHandle.parentElement.classList.add('pump-jammed');
-        pumpInd.innerText = "JAMMED!";
-        pumpInd.style.color = "#fff";
-        pumpInd.style.background = "#f00";
+        document.getElementById('pump-indicator').innerText = "JAMMED!";
+        document.getElementById('pump-indicator').style.color = "#fff";
+        document.getElementById('pump-indicator').style.background = "#f00";
         return;
     }
     pumpHandle.classList.add('pump-active');
@@ -105,7 +102,6 @@ function pumpTime(e) {
     if(totalMinutes >= 1440) totalMinutes -= 1440;
     updateClockUI();
     
-    // Pump Sound
     if(audioCtx) {
         let o = audioCtx.createOscillator();
         let g = audioCtx.createGain();
@@ -152,27 +148,21 @@ function updateClockUI() {
     amPm.innerText = ap;
 }
 
-// --- VOLUME WHEEL LOGIC (DECORATIVE SPIN) ---
+// --- WHEEL ---
 function spinWheel() {
     if(isLocked || isSpinning) return;
     initAudio();
     isSpinning = true;
     wheel.classList.add('spinning'); 
     volStatus.innerText = "SPINNING...";
-    
-    // Random rotation (720deg minimum + random)
     let deg = Math.floor(720 + Math.random() * 360);
     wheel.style.transform = `rotate(${deg}deg)`;
     
-    // Play Clicky/Tick Sound
     let clickCnt = 0;
     let clickInterval = setInterval(() => {
         if(clickCnt++ > 15) clearInterval(clickInterval);
-        
-        // Visual Tick
         wheelPointer.classList.add('tick-anim');
         setTimeout(()=> wheelPointer.classList.remove('tick-anim'), 100);
-
         if(audioCtx) {
             let o = audioCtx.createOscillator();
             let g = audioCtx.createGain();
@@ -187,26 +177,20 @@ function spinWheel() {
         wheel.classList.remove('spinning');
         currentVol = Math.floor(Math.random() * 100);
         volBar.style.width = currentVol + "%";
-        
         if(currentVol < 20) {
-            volStatus.innerText = `QUIET (${currentVol}%)`;
-            volStatus.style.color = "#88aa88";
+            volStatus.innerText = `QUIET (${currentVol}%)`; volStatus.style.color = "#88aa88";
             frogMouth.style.height = "2px"; 
         } else if(currentVol > 80) {
-            volStatus.innerText = `EAR BLEED (${currentVol}%)`;
-            volStatus.style.color = "red";
-            frogMouth.style.height = "20px"; 
-            frogMouth.style.borderRadius = "50%";
+            volStatus.innerText = `EAR BLEED (${currentVol}%)`; volStatus.style.color = "red";
+            frogMouth.style.height = "20px"; frogMouth.style.borderRadius = "50%";
         } else {
-            volStatus.innerText = `OKAY (${currentVol}%)`;
-            volStatus.style.color = "yellow";
-            frogMouth.style.height = "10px"; 
-            frogMouth.style.borderRadius = "0 0 10px 10px";
+            volStatus.innerText = `OKAY (${currentVol}%)`; volStatus.style.color = "yellow";
+            frogMouth.style.height = "10px"; frogMouth.style.borderRadius = "0 0 10px 10px";
         }
     }, 3000); 
 }
 
-// --- LOCK LOGIC ---
+// --- LOCK ---
 let draggingSlider = false;
 sliderKnob.addEventListener('mousedown', () => draggingSlider = true);
 sliderKnob.addEventListener('touchstart', (e) => { e.preventDefault(); draggingSlider = true; });
@@ -226,10 +210,8 @@ function handleSlider(cx) {
 }
 function attemptLock() {
     if(!isFrozen) { statusMsg.innerText = "FREEZE TIME FIRST!"; statusMsg.style.color = "red"; resetSlider(); return; }
-    
     if(currentVol > 80) { statusMsg.innerText = "TOO LOUD! SPIN AGAIN!"; statusMsg.style.color = "red"; resetSlider(); return; }
     if(currentVol === 0) { statusMsg.innerText = "SPIN THE WHEEL FIRST!"; statusMsg.style.color = "yellow"; resetSlider(); return; }
-
     isLocked = true;
     sliderKnob.style.left = (sliderTrack.offsetWidth - 50) + 'px';
     sliderKnob.innerText = "🔒"; sliderKnob.style.background = "#0f0";
@@ -251,38 +233,24 @@ function checkRealTime() {
     }
 }
 
-// ==========================================
-// --- TRIGGER ALARM (HORRIBLE SOUND EDITION) ---
-// ==========================================
+// --- ALARM ---
 function triggerAlarm() {
     clearInterval(checkInterval);
     isRinging = true;
-    
     document.getElementById('stabilizer-overlay').style.display = 'flex';
     document.body.classList.add('shaking');
-    
-    stability = 0;
-    stabCountdown = 15;
-    adsRemaining = 5; 
+    stability = 0; stabCountdown = 15; adsRemaining = 5; 
     progressBar.style.width = "0%";
     stabTimerDisplay.innerText = stabCountdown;
-    
-    // --- HORRIBLE AUDIO START ---
     initAudio();
     playHorribleAlarm();
-
     moveSafeZone();
-    
     if(stabInterval) clearInterval(stabInterval);
     stabInterval = setInterval(() => {
         stabCountdown--;
         stabTimerDisplay.innerText = stabCountdown;
         if(stabCountdown <= 5) stabTimerDisplay.style.color = "red";
-        
-        if(stabCountdown <= 0) {
-            clearInterval(stabInterval);
-            failStabilizer(); 
-        }
+        if(stabCountdown <= 0) { clearInterval(stabInterval); failStabilizer(); }
     }, 1000);
 }
 
@@ -290,25 +258,12 @@ function playHorribleAlarm() {
     const osc1 = audioCtx.createOscillator();
     const osc2 = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    
-    osc1.type = 'sawtooth';
-    osc2.type = 'square';
-    
-    osc1.frequency.value = 500;
-    osc2.frequency.value = 550; 
-    
+    osc1.type = 'sawtooth'; osc2.type = 'square';
+    osc1.frequency.value = 500; osc2.frequency.value = 550; 
     gain.gain.value = 0.8; 
-    
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    osc1.start();
-    osc2.start();
-    
+    osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+    osc1.start(); osc2.start();
     alarmOsc = { stop: () => { osc1.stop(); osc2.stop(); clearInterval(sirenInterval); } };
-    
-    // SIREN EFFECT
     let high = false;
     sirenInterval = setInterval(() => {
         high = !high;
@@ -318,65 +273,32 @@ function playHorribleAlarm() {
     }, 300);
 }
 
-
-// --- LEVEL 1: STABILIZER ---
 function moveSafeZone() {
     setInterval(() => {
-        let maxW = window.innerWidth - 150;
-        let maxH = window.innerHeight - 150;
-        let x = Math.random() * maxW;
-        let y = Math.random() * maxH;
-        safeZone.style.left = x + 'px';
-        safeZone.style.top = y + 'px';
+        let maxW = window.innerWidth - 150; let maxH = window.innerHeight - 150;
+        let x = Math.random() * maxW; let y = Math.random() * maxH;
+        safeZone.style.left = x + 'px'; safeZone.style.top = y + 'px';
     }, 1500);
 }
-
-window.addEventListener('mousemove', (e) => { 
-    if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.clientX, e.clientY); 
-});
-window.addEventListener('touchmove', (e) => { 
-    if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.touches[0].clientX, e.touches[0].clientY); 
-});
+window.addEventListener('mousemove', (e) => { if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.clientX, e.clientY); });
+window.addEventListener('touchmove', (e) => { if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.touches[0].clientX, e.touches[0].clientY); });
 
 function runStabilizer(clientX, clientY) {
     let invX = window.innerWidth - clientX;
     let invY = window.innerHeight - clientY;
-    fakeCursor.style.left = invX + 'px';
-    fakeCursor.style.top = invY + 'px';
-    
+    fakeCursor.style.left = invX + 'px'; fakeCursor.style.top = invY + 'px';
     let sz = safeZone.getBoundingClientRect();
-    let cx = sz.left + sz.width/2;
-    let cy = sz.top + sz.height/2;
+    let cx = sz.left + sz.width/2; let cy = sz.top + sz.height/2;
     let dist = Math.sqrt((invX - cx)**2 + (invY - cy)**2);
-    
-    if(dist < 75) {
-        stability += 0.8; 
-        safeZone.style.borderColor = "#00ff00";
-    } else {
-        stability -= 1.0;
-        if(stability < 0) stability = 0;
-        safeZone.style.borderColor = "#fff";
-    }
+    if(dist < 75) { stability += 0.8; safeZone.style.borderColor = "#00ff00"; } 
+    else { stability -= 1.0; if(stability < 0) stability = 0; safeZone.style.borderColor = "#fff"; }
     progressBar.style.width = Math.min(stability, 100) + "%";
-    
-    if(stability >= 100) {
-        clearInterval(stabInterval);
-        stopAlarmTotally();
-    }
+    if(stability >= 100) { clearInterval(stabInterval); stopAlarmTotally(); }
 }
 
-function failStabilizer() {
-    document.getElementById('stabilizer-overlay').style.display = 'none';
-    startAdsLevel();
-}
+function failStabilizer() { document.getElementById('stabilizer-overlay').style.display = 'none'; startAdsLevel(); }
 
-// ===============================================
-// --- LEVEL 2: WHOLE SCREEN BUTTON & SPIN SOUND ---
-// ===============================================
-function startAdsLevel() {
-    document.getElementById('ad-overlay').style.display = 'flex';
-    setupNextAd();
-}
+function startAdsLevel() { document.getElementById('ad-overlay').style.display = 'flex'; setupNextAd(); }
 
 function setupNextAd() {
     const data = adData[5 - adsRemaining];
@@ -385,110 +307,49 @@ function setupNextAd() {
         document.getElementById('ad-body').innerText = data.body;
     }
     document.getElementById('ad-count').innerText = `Ads remaining: ${adsRemaining}`;
-
     const closeBtn = document.querySelector('.close-ad');
     const popup = document.getElementById('current-ad');
-
-    if(closeBtn.parentNode !== popup) {
-        popup.appendChild(closeBtn);
-    }
-
-    // Reset Button
+    if(closeBtn.parentNode !== popup) popup.appendChild(closeBtn);
     closeBtn.classList.remove('running-mode'); 
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '5px';
-    closeBtn.style.right = '5px';
-    closeBtn.style.left = 'auto';
-    closeBtn.style.background = '#ff4444'; 
-    closeBtn.innerText = "×";
-    closeBtn.style.border = '4px solid #fff';
-
+    closeBtn.style.position = 'absolute'; closeBtn.style.top = '5px'; closeBtn.style.right = '5px';
+    closeBtn.style.left = 'auto'; closeBtn.style.background = '#00ffff'; 
+    closeBtn.innerText = "×"; closeBtn.style.border = '5px dotted #ff0000';
     jumpsRemaining = Math.floor(Math.random() * 4) + 3; 
-
-    // Refresh Listeners
     const newBtn = closeBtn.cloneNode(true);
     closeBtn.parentNode.replaceChild(newBtn, closeBtn);
-
     newBtn.addEventListener('mouseover', runButtonRun);
-    newBtn.addEventListener('touchstart', (e) => { 
-        if(jumpsRemaining > 0) { e.preventDefault(); runButtonRun(); }
-    });
-
-    newBtn.onclick = function() {
-        if(jumpsRemaining <= 0) closeAd();
-    };
+    newBtn.addEventListener('touchstart', (e) => { if(jumpsRemaining > 0) { e.preventDefault(); runButtonRun(); } });
+    newBtn.onclick = function() { if(jumpsRemaining <= 0) closeAd(); };
 }
 
 function runButtonRun() {
     if(jumpsRemaining > 0) {
         playZipSound();
-
         const btn = document.querySelector('.close-ad');
-        
-        // --- FIX: MOVE BUTTON TO BODY SO IT DOESN'T DISAPPEAR ---
-        if(btn.parentNode !== document.body) {
-            document.body.appendChild(btn);
-        }
-
-        btn.classList.add('running-mode');
-        btn.style.position = 'fixed';
-        
-        let maxX = window.innerWidth - 60;
-        let maxY = window.innerHeight - 60;
-        let newX = Math.floor(Math.random() * maxX);
-        let newY = Math.floor(Math.random() * maxY);
-
-        btn.style.left = newX + 'px';
-        btn.style.top = newY + 'px';
-        btn.style.right = 'auto'; 
-
+        if(btn.parentNode !== document.body) document.body.appendChild(btn);
+        btn.classList.add('running-mode'); btn.style.position = 'fixed';
+        let maxX = window.innerWidth - 60; let maxY = window.innerHeight - 60;
+        let newX = Math.floor(Math.random() * maxX); let newY = Math.floor(Math.random() * maxY);
+        btn.style.left = newX + 'px'; btn.style.top = newY + 'px'; btn.style.right = 'auto'; 
         jumpsRemaining--;
-
-        if(jumpsRemaining === 0) {
-            btn.style.background = '#00ff00';
-            btn.style.border = '3px solid #000';
-            btn.style.color = '#000';
-            btn.innerText = "OK";
-        }
+        if(jumpsRemaining === 0) { btn.style.background = '#00ff00'; btn.style.border = '3px solid #000'; btn.style.color = '#000'; btn.innerText = "OK"; }
     }
 }
 
-// ZIP SOUND EFFECT
 function playZipSound() {
     if(!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+    osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-    
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
 function closeAd() {
     if(jumpsRemaining > 0) return;
     adsRemaining--;
-    
-    if (adsRemaining <= 0) {
-        stopAlarmTotally();
-    } else {
-        setupNextAd();
-        const popup = document.getElementById('current-ad');
-        popup.style.transform = `scale(0.1)`;
-        setTimeout(() => { popup.style.transform = `scale(1)`; }, 100);
-    }
+    if (adsRemaining <= 0) { stopAlarmTotally(); } 
+    else { setupNextAd(); const popup = document.getElementById('current-ad'); popup.style.transform = `scale(0.1)`; setTimeout(() => { popup.style.transform = `scale(1)`; }, 100); }
 }
 
-function stopAlarmTotally() {
-    if(alarmOsc) alarmOsc.stop();
-    alert("GOOD MORNING! Alarm Deactivated.");
-    location.reload();
-}
+function stopAlarmTotally() { if(alarmOsc) alarmOsc.stop(); alert("GOOD MORNING! Alarm Deactivated."); location.reload(); }

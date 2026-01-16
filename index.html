@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Froggy Alarm: Wheel Edition</title>
+    <title>Froggy Alarm: Worst Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <button onclick="triggerAlarm()" style="position: fixed; top: 10px; left: 10px; z-index: 2000; padding: 10px; background: red; color: white; border: 2px solid white; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        🚨 TEST ALARM
+        🚨 TEST
     </button>
 
     <header>
@@ -67,23 +67,18 @@
 
             <div class="wheel-scene">
                 <div class="wheel-container">
-                    <div id="vol-wheel">
-                        <div class="wheel-center"></div>
-                    </div>
-                    <div class="wheel-pointer">▼</div>
+                    <div id="vol-wheel"><div class="wheel-center"></div></div>
+                    <div class="wheel-pointer" id="wheel-pointer">▼</div>
                 </div>
-
                 <div id="watcher-frog">
-                    <div class="mini-eyes">
-                        <div class="mini-eye"></div>
-                        <div class="mini-eye"></div>
+                    <div class="watcher-eyes">
+                        <div class="watcher-eye"><div class="watcher-pupil"></div></div>
+                        <div class="watcher-eye"><div class="watcher-pupil"></div></div>
                     </div>
                     <div class="mini-mouth" id="frog-mouth"></div>
                 </div>
             </div>
-
             <button id="spin-btn" onclick="spinWheel()">🎲 SPIN WHEEL</button>
-            <p class="instruction">NO MANUAL ADJUSTMENT!</p>
         </div>
     </div>
 
