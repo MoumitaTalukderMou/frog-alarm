@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cute Frog Alarm</title>
+    <title>Froggy Alarm: Wheel Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <button onclick="triggerAlarm()" style="position: fixed; top: 10px; left: 10px; z-index: 2000; padding: 10px; background: red; color: white; border: 2px solid white; font-weight: bold; cursor: pointer; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+        🚨 TEST ALARM
+    </button>
+
     <header>
         <h1>FROGGY ALARM 🐸</h1>
-        <p>Pump Time -> Freeze -> Drown Frog -> Lock</p>
+        <p>Pump -> Freeze -> Spin Vol -> Lock</p>
     </header>
 
     <div class="main-wrapper">
-        
         <div class="panel" id="clock-panel">
-            
             <div class="frog-clock-container">
                 <div class="frog-body-shape">
                     <div class="frog-eyes">
@@ -25,7 +27,6 @@
                     </div>
                     <div class="frog-belly"></div>
                     <div class="frog-legs"></div>
-                    
                     <div class="clock-face">
                         <div class="marker twelve">12</div>
                         <div class="marker three">3</div>
@@ -38,14 +39,10 @@
                     <div class="mouth"></div>
                 </div>
             </div>
-
             <div class="status-panel">
                 <div class="label">TIME PRESSURE</div>
-                <div class="digital-time">
-                    <span id="d-time">12:00</span> <span id="am-pm">AM</span>
-                </div>
+                <div class="digital-time"><span id="d-time">12:00</span> <span id="am-pm">AM</span></div>
             </div>
-
             <div class="controls-row">
                 <div class="pump-container">
                     <div id="pump-indicator">OK</div>
@@ -57,40 +54,37 @@
                         <div class="pump-body"></div>
                     </div>
                 </div>
-
-                <button id="freeze-btn" onclick="freezeTime()">
-                    ❄ FREEZE ❄
-                </button>
+                <button id="freeze-btn" onclick="freezeTime()">❄ FREEZE ❄</button>
             </div>
         </div>
 
         <div class="panel frog-panel" id="volume-panel">
             <div class="display-screen">
-                <div class="label">FROG VOLUME</div>
+                <div class="label">LUCKY VOLUME</div>
                 <div class="bar-container"><div id="vol-bar"></div></div>
-                <div id="vol-status">LOUD!</div>
+                <div id="vol-status">SPIN IT!</div>
             </div>
 
-            <div class="pond-container" id="pond">
-                <div class="water-level"></div>
-                
-                <div id="vol-frog">
+            <div class="wheel-scene">
+                <div class="wheel-container">
+                    <div id="vol-wheel">
+                        <div class="wheel-center"></div>
+                    </div>
+                    <div class="wheel-pointer">▼</div>
+                </div>
+
+                <div id="watcher-frog">
                     <div class="mini-eyes">
                         <div class="mini-eye"></div>
                         <div class="mini-eye"></div>
                     </div>
-                    <div class="mini-belly"></div>
-                    <div class="mini-legs"></div>
-                </div>
-                
-                <div class="pond-depth-markers">
-                    <span>LOUD</span>
-                    <span>MUTE</span>
+                    <div class="mini-mouth" id="frog-mouth"></div>
                 </div>
             </div>
-            <p class="instruction">DRAG HIM DOWN!</p>
-        </div>
 
+            <button id="spin-btn" onclick="spinWheel()">🎲 SPIN WHEEL</button>
+            <p class="instruction">NO MANUAL ADJUSTMENT!</p>
+        </div>
     </div>
 
     <div class="lock-section">
@@ -103,15 +97,27 @@
 
     <div id="stabilizer-overlay">
         <h1 class="shake-text">WAKE UP!</h1>
+        <div id="stab-timer">15</div>
         <div id="safe-zone"></div>
         <div id="fake-cursor"></div>
-        <div class="stab-msg">HOLD DOT IN CIRCLE (5s)</div>
+        <div class="stab-msg">HOLD DOT IN CIRCLE (WIN = NO ADS)</div>
         <div class="progress-box"><div id="stop-progress"></div></div>
+    </div>
+
+    <div id="ad-overlay">
+        <div id="ad-container">
+            <div class="ad-popup" id="current-ad">
+                <span class="close-ad">×</span>
+                <div class="ad-content">
+                    <h2 id="ad-title">FAILED!</h2>
+                    <p id="ad-body">Too slow! Catch the button!</p>
+                    <button class="ad-claim">CLAIM NOW</button>
+                </div>
+            </div>
+            <p id="ad-count">Ads remaining: 5</p>
+        </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-</html> 
-
-
-
+</html>
