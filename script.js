@@ -1,4 +1,4 @@
-// --- VARIABLES ---
+// --- BASE VARIABLES ---
 let totalMinutes = 720;
 let leakRate = 0.5;
 let isLocked = false;
@@ -19,7 +19,8 @@ const wheelPointer = document.getElementById('wheel-pointer');
 
 // ALARM
 let isRinging = false;
-let alarmOsc = null;
+let audioCtx = null;
+let alarmNodes = [];
 let sirenInterval = null;
 let stability = 0;
 let stabCountdown = 15;
@@ -51,8 +52,7 @@ const fakeCursor = document.getElementById('fake-cursor');
 const progressBar = document.getElementById('stop-progress');
 const stabTimerDisplay = document.getElementById('stab-timer');
 
-// AUDIO
-let audioCtx = null;
+// AUDIO INIT
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -212,12 +212,12 @@ function checkRealTime() {
     }
 }
 
-// --- ALARM LOGIC (MODIFIED FOR HORROR) ---
+// --- ALARM TRIGGER ---
 function triggerAlarm() {
     clearInterval(checkInterval);
     isRinging = true;
     
-    // START UGLY MODE
+    // START CHAOS MODE
     document.body.classList.add('alarm-active');
     document.body.classList.add('shaking');
     
@@ -227,7 +227,7 @@ function triggerAlarm() {
     stabTimerDisplay.innerText = stabCountdown;
     
     initAudio();
-    playHorribleAlarm();
+    playChaosSound(); 
     moveSafeZone();
     
     if(stabInterval) clearInterval(stabInterval);
@@ -243,34 +243,79 @@ function triggerAlarm() {
     }, 1000);
 }
 
-function playHorribleAlarm() {
+// --- CHAOS SOUND ENGINE ---
+function playChaosSound() {
+    stopAllSounds();
+    if(!audioCtx) initAudio();
+
+    const masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1.0; 
+    masterGain.connect(audioCtx.destination);
+
+    // 1. SIREN
     const osc1 = audioCtx.createOscillator();
+    osc1.type = 'sawtooth'; osc1.frequency.value = 700;
+    osc1.connect(masterGain); osc1.start();
+    alarmNodes.push(osc1);
+
+    // 2. METAL SCRATCH
     const osc2 = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc1.type = 'sawtooth'; osc2.type = 'square';
-    osc1.frequency.value = 500; osc2.frequency.value = 550; 
-    gain.gain.value = 0.8; 
-    osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
-    osc1.start(); osc2.start();
-    
-    alarmOsc = { stop: () => { osc1.stop(); osc2.stop(); clearInterval(sirenInterval); } };
-    
-    let high = false;
+    osc2.type = 'square'; osc2.frequency.value = 2500; 
+    osc2.connect(masterGain); osc2.start();
+    alarmNodes.push(osc2);
+
+    // 3. LOW RUMBLE
+    const osc3 = audioCtx.createOscillator();
+    osc3.type = 'triangle'; osc3.frequency.value = 50; 
+    osc3.connect(masterGain); osc3.start();
+    alarmNodes.push(osc3);
+
+    // 4. RANDOM BEEPING
+    const osc4 = audioCtx.createOscillator();
+    osc4.type = 'square'; osc4.frequency.value = 1000;
+    const gain4 = audioCtx.createGain(); gain4.gain.value = 0.5;
+    osc4.connect(gain4); gain4.connect(masterGain);
+    osc4.start();
+    alarmNodes.push(osc4);
+
+    // 5. STATIC NOISE
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer; noise.loop = true;
+    const noiseGain = audioCtx.createGain(); noiseGain.gain.value = 0.2;
+    noise.connect(noiseGain); noiseGain.connect(masterGain);
+    noise.start();
+    alarmNodes.push(noise);
+
+    // MODULATION
+    let toggle = false;
     sirenInterval = setInterval(() => {
-        high = !high;
-        let freq = high ? 900 : 500;
-        osc1.frequency.linearRampToValueAtTime(freq, audioCtx.currentTime + 0.1);
-        osc2.frequency.linearRampToValueAtTime(freq + 50, audioCtx.currentTime + 0.1);
-    }, 300);
+        toggle = !toggle;
+        const now = audioCtx.currentTime;
+        osc1.frequency.linearRampToValueAtTime(toggle ? 1200 : 600, now + 0.1);
+        osc2.frequency.setValueAtTime(2000 + Math.random() * 1000, now);
+        if(Math.random() > 0.5) gain4.gain.value = 0.8; else gain4.gain.value = 0;
+    }, 150);
 }
 
-// STABILIZER
+function stopAllSounds() {
+    if(alarmNodes.length > 0) {
+        alarmNodes.forEach(node => { try { node.stop(); node.disconnect(); } catch(e){} });
+        alarmNodes = [];
+    }
+    if(sirenInterval) clearInterval(sirenInterval);
+}
+
+// --- LEVEL 1: STABILIZER (FASTER SHAKE) ---
 function moveSafeZone() {
     setInterval(() => {
         let maxW = window.innerWidth - 150; let maxH = window.innerHeight - 150;
         let x = Math.random() * maxW; let y = Math.random() * maxH;
         safeZone.style.left = x + 'px'; safeZone.style.top = y + 'px';
-    }, 1500);
+    }, 800); 
 }
 window.addEventListener('mousemove', (e) => { if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.clientX, e.clientY); });
 window.addEventListener('touchmove', (e) => { if(isRinging && stabCountdown > 0 && stability < 100) runStabilizer(e.touches[0].clientX, e.touches[0].clientY); });
@@ -308,11 +353,19 @@ function setupNextAd() {
     
     const closeBtn = document.querySelector('.close-ad');
     const popup = document.getElementById('current-ad');
+    
     if(closeBtn.parentNode !== popup) popup.appendChild(closeBtn);
     
     closeBtn.classList.remove('running-mode'); 
-    closeBtn.style.position = 'absolute'; closeBtn.style.top = '-15px'; closeBtn.style.right = '-15px';
+    closeBtn.style.position = 'absolute'; closeBtn.style.top = '-20px'; closeBtn.style.right = '-20px';
     closeBtn.style.left = 'auto'; 
+    
+    // RED RESET
+    closeBtn.style.background = '#ff0000';
+    closeBtn.style.border = '5px solid #fff';
+    closeBtn.style.color = '#fff';
+    closeBtn.innerText = "×";
+
     jumpsRemaining = Math.floor(Math.random() * 4) + 3; 
     
     const newBtn = closeBtn.cloneNode(true);
@@ -326,13 +379,23 @@ function runButtonRun() {
     if(jumpsRemaining > 0) {
         playZipSound();
         const btn = document.querySelector('.close-ad');
+        
         if(btn.parentNode !== document.body) document.body.appendChild(btn);
-        btn.classList.add('running-mode'); btn.style.position = 'fixed';
+        
+        btn.classList.add('running-mode'); 
+        btn.style.position = 'fixed'; 
+        
         let maxX = window.innerWidth - 60; let maxY = window.innerHeight - 60;
         let newX = Math.floor(Math.random() * maxX); let newY = Math.floor(Math.random() * maxY);
         btn.style.left = newX + 'px'; btn.style.top = newY + 'px'; btn.style.right = 'auto'; 
         jumpsRemaining--;
-        if(jumpsRemaining === 0) { btn.style.background = '#00ff00'; btn.style.border = '4px solid #000'; btn.innerText = "OK"; }
+        
+        // RED OK BUTTON
+        if(jumpsRemaining === 0) { 
+            btn.style.background = '#ff0000'; 
+            btn.style.border = '5px solid #fff'; 
+            btn.innerText = "OK"; 
+        }
     }
 }
 
@@ -358,8 +421,8 @@ function closeAd() {
 }
 
 function stopAlarmTotally() {
-    if(alarmOsc) alarmOsc.stop();
-    document.body.classList.remove('alarm-active'); // Remove Ugly Mode
+    stopAllSounds(); 
+    document.body.classList.remove('alarm-active'); 
     document.body.classList.remove('shaking');
     alert("GOOD MORNING! Alarm Deactivated.");
     location.reload();
