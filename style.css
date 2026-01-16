@@ -2,65 +2,124 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-    background-color: #0a150a;
+    background-color: #051005; /* Deep Jungle Dark */
     color: #ccffcc;
     font-family: 'Verdana', sans-serif;
     margin: 0;
-    height: 100dvh;
-    overflow: hidden;
+    height: 100dvh; /* Dynamic Viewport Height for Mobile */
+    overflow: hidden; /* NO SCROLLING */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding-bottom: 10px;
+    justify-content: flex-start;
+    transition: background 0.2s;
 }
 
-/* --- EXTREME SHAKE ANIMATION --- */
-body.shaking { animation: extremeShake 0.05s infinite; }
+/* =========================================
+   HORRIBLE ALARM MODE (WORST COLORS)
+   ========================================= */
+body.alarm-active {
+    animation: epilepticFlash 0.1s infinite; /* Extreme Flashing */
+    font-family: 'Courier New', monospace;
+}
 
-@keyframes extremeShake {
+/* Flashing Background */
+@keyframes epilepticFlash {
+    0% { background: #ffff00; } /* Yellow */
+    25% { background: #ff00ff; } /* Magenta */
+    50% { background: #00ffff; } /* Cyan */
+    75% { background: #ff0000; } /* Red */
+    100% { background: #0000ff; } /* Blue */
+}
+
+/* When Alarm Rings: Make Panels Ugly */
+body.alarm-active .panel {
+    background: #000 !important;
+    border: 5px dotted #ff0000 !important;
+    box-shadow: 10px 10px 0 #ffff00 !important;
+}
+body.alarm-active h1, body.alarm-active p, body.alarm-active div {
+    color: #fff !important;
+    text-shadow: 2px 2px #000 !important;
+}
+
+/* Extreme Shake Animation */
+body.shaking { animation: violentShake 0.05s infinite; }
+
+@keyframes violentShake {
     0% { transform: translate(0, 0) rotate(0deg); }
-    20% { transform: translate(-15px, 15px) rotate(-5deg); }
-    40% { transform: translate(15px, -15px) rotate(5deg); }
-    60% { transform: translate(-15px, -15px) rotate(-5deg); }
-    80% { transform: translate(15px, 15px) rotate(5deg); }
+    25% { transform: translate(-10px, 10px) rotate(-5deg); }
+    50% { transform: translate(10px, -10px) rotate(5deg); }
+    75% { transform: translate(-10px, -10px) rotate(-5deg); }
     100% { transform: translate(0, 0) rotate(0deg); }
 }
 
-/* Header */
-header { text-align: center; padding-top: 10px; flex-shrink: 0; height: 50px; }
-header h1 { margin: 0; color: #44ff44; text-shadow: 0 0 10px #004400; font-size: 1.2rem; }
-header p { font-size: 0.6rem; color: #88aa88; margin: 0; }
+/* =========================================
+   LAYOUT (NO SCROLL FIX)
+   ========================================= */
 
+/* Header: Takes minimum space */
+header { 
+    height: 40px; flex-shrink: 0; 
+    display: flex; flex-direction: column; justify-content: center;
+    z-index: 10;
+}
+header h1 { margin: 0; font-size: 1.2rem; color: #44ff44; }
+header p { font-size: 0.6rem; margin: 0; color: #88aa88; }
+
+/* Main Wrapper: Fits remaining space */
 .main-wrapper {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    width: 100%; flex-grow: 1; gap: 10px; padding: 5px; position: relative;
+    display: flex; flex-direction: column;
+    width: 100%; 
+    flex-grow: 1; /* Fills height */
+    padding: 10px;
+    gap: 10px;
+    overflow: hidden; /* Clips internal overflow */
 }
 
+/* Panels */
 .panel {
-    width: 90%; background: #112211; border: 2px solid #335533; border-radius: 15px;
+    width: 100%;
+    background: #112211; border: 2px solid #335533; border-radius: 15px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5); position: relative;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
-/* Clock Panel */
-#clock-panel { flex: 2; max-height: 55vh; }
-.frog-clock-container { position: relative; width: 220px; height: 180px; transform: scale(1.1); margin-bottom: 5px; display: flex; justify-content: center; }
+/* --- CLOCK PANEL (BIGGER PRIORITY) --- */
+#clock-panel {
+    flex: 3; /* Takes 3 parts of space */
+    min-height: 0; /* Allows shrinking properly */
+}
 
-/* Volume Panel */
-#volume-panel { flex: 1; max-height: 25vh; padding: 5px; }
+/* Resize Frog based on available height using vh/percentage */
+.frog-clock-container {
+    position: relative; 
+    width: 100%; height: 60%; /* Occupy 60% of clock panel */
+    display: flex; justify-content: center; align-items: center;
+}
+/* Scale the frog to fit container without overflow */
+.frog-body-shape {
+    width: 160px; height: 140px;
+    background: #66bb6a; border-radius: 50% 50% 45% 45%; border: 3px solid #1b5e20;
+    position: relative;
+    box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2);
+    /* Make frog slightly bigger */
+    transform: scale(1.2); 
+    transform-origin: center bottom;
+}
 
-/* Frog Graphics */
-.frog-body-shape { width: 160px; height: 140px; background: #66bb6a; border-radius: 50% 50% 45% 45%; border: 3px solid #1b5e20; position: absolute; bottom: 0; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2); }
 .frog-eyes { position: absolute; top: -15px; width: 100%; display: flex; justify-content: space-between; padding: 0 15px; }
 .eye { width: 45px; height: 45px; background: #fff; border: 3px solid #1b5e20; border-radius: 50%; position: relative; z-index: 5; }
 .pupil { width: 15px; height: 15px; background: #000; border-radius: 50%; position: absolute; top: 12px; left: 15px; }
 .pupil::after { content:''; width: 5px; height: 5px; background: #fff; border-radius: 50%; position: absolute; top: 2px; right: 3px; }
 .frog-belly { position: absolute; bottom: 10px; left: 15px; width: 124px; height: 100px; background: #a5d6a7; border-radius: 50%; opacity: 0.8; }
 .mouth { width: 60px; height: 20px; border-bottom: 3px solid #1b5e20; border-radius: 50%; position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); }
-.frog-legs { position: absolute; bottom: -5px; width: 100%; height: 20px; background: transparent; z-index: -1; }
+.frog-legs { position: absolute; bottom: -5px; width: 100%; height: 20px; z-index: -1; }
 .frog-legs::before, .frog-legs::after { content: ''; position: absolute; bottom: 0; width: 40px; height: 20px; background: #66bb6a; border: 3px solid #1b5e20; border-radius: 20px; }
 .frog-legs::before { left: -10px; transform: rotate(-20deg); } .frog-legs::after { right: -10px; transform: rotate(20deg); }
+
+/* Clock Hands */
 .clock-face { position: absolute; top: 20px; left: 30px; width: 100px; height: 100px; z-index: 6; }
 .marker { position: absolute; font-weight: bold; color: #1b5e20; font-size: 0.9rem; }
 .twelve { top: 5px; left: 50%; transform: translateX(-50%); } .six { bottom: 5px; left: 50%; transform: translateX(-50%); } .three { right: 5px; top: 42%; } .nine { left: 5px; top: 42%; }
@@ -68,133 +127,103 @@ header p { font-size: 0.6rem; color: #88aa88; margin: 0; }
 .hour { width: 6px; height: 25px; margin-left: -3px; } .minute { width: 4px; height: 40px; background: #d32f2f; margin-left: -2px; }
 .center-dot { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); z-index: 8; border: 2px solid #000; }
 
-/* Controls */
-.status-panel { text-align: center; margin-bottom: 5px; width: 100%; transform: scale(0.9); }
-.label { font-size: 0.6rem; color: #88aa88; }
-.digital-time { font-size: 1.5rem; font-weight: bold; color: #fff; }
-.controls-row { display: flex; gap: 20px; align-items: flex-end; justify-content: center; width: 100%; transform: scale(0.9); }
-.pump-container { display: flex; flex-direction: column; align-items: center; }
-#pump-indicator { font-size: 0.6rem; margin-bottom: 2px; }
-.pump-mechanism { position: relative; width: 60px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.pump-body { width: 40px; height: 30px; background: #444; border-radius: 5px; z-index: 1; border: 2px solid #666; }
-#pump-handle { position: absolute; bottom: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 10; transition: transform 0.05s ease-out; touch-action: none; }
-.handle-grip { width: 60px; height: 25px; background: #ffaa00; border-radius: 5px; color: #000; font-weight: bold; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #cc8800; border: 1px solid #fff; }
+/* Status & Controls */
+.status-panel { margin-bottom: 5px; width: 100%; text-align: center; }
+.digital-time { font-size: 1.8rem; font-weight: bold; color: #fff; }
+.controls-row { display: flex; gap: 30px; align-items: flex-end; justify-content: center; width: 100%; height: 30%; }
+
+.pump-mechanism { position: relative; width: 60px; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.pump-body { width: 40px; height: 25px; background: #444; border-radius: 5px; border: 2px solid #666; }
+#pump-handle { position: absolute; bottom: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 10; transition: transform 0.05s ease-out; }
+.handle-grip { width: 60px; height: 20px; background: #ffaa00; border-radius: 5px; color: #000; font-weight: bold; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; border: 1px solid #fff; box-shadow: 0 4px 0 #cc8800; }
 .handle-grip:active { background: #fff; }
-.piston-shaft { width: 10px; height: 80px; background: #999; z-index: -1; }
-.pump-active { transform: translateY(25px) !important; }
+.piston-shaft { width: 8px; height: 60px; background: #999; z-index: -1; }
+.pump-active { transform: translateY(20px) !important; }
 .pump-jammed .handle-grip { background: red !important; color: white; }
 .pump-shake { animation: shake 0.1s infinite; }
-#freeze-btn { width: 80px; height: 40px; background: #00ccff; border: none; border-radius: 5px; color: #000; font-weight: bold; font-size: 0.7rem; box-shadow: 0 4px 0 #0088aa; }
+
+#freeze-btn { width: 80px; height: 35px; background: #00ccff; border: none; border-radius: 5px; color: #000; font-weight: bold; font-size: 0.7rem; box-shadow: 0 4px 0 #0088aa; }
 #freeze-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0088aa; }
 
-/* Wheel */
-.bar-container { width: 80%; height: 4px; background: #223322; margin-bottom: 5px; }
+/* --- VOLUME PANEL (SMALLER PRIORITY) --- */
+#volume-panel {
+    flex: 2; /* Takes 2 parts */
+    min-height: 0;
+    justify-content: space-evenly;
+}
+.display-screen { width: 100%; text-align: center; }
+.bar-container { width: 80%; height: 6px; background: #223322; margin: 5px auto; }
 #vol-bar { width: 0%; height: 100%; background: #ff0000; transition: width 0.3s; }
-#vol-status { font-size: 0.7rem; font-weight: bold; color: yellow; text-align: center; margin-bottom: 5px; }
-.wheel-scene { width: 100%; height: 100px; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px; }
-.wheel-container { position: relative; width: 90px; height: 90px; }
+#vol-status { font-size: 0.8rem; font-weight: bold; color: yellow; }
+
+.wheel-scene { width: 100%; height: 80px; display: flex; align-items: center; justify-content: center; gap: 20px; }
+.wheel-container { position: relative; width: 70px; height: 70px; }
 #vol-wheel {
     width: 100%; height: 100%; border-radius: 50%; border: 3px solid #fff;
     background: conic-gradient(#ff0055 0deg 30deg, #ffcc00 30deg 60deg, #00ff00 60deg 90deg, #0099ff 90deg 120deg, #aa00ff 120deg 150deg, #ff0055 150deg 180deg, #ffcc00 180deg 210deg, #00ff00 210deg 240deg, #0099ff 240deg 270deg, #aa00ff 270deg 300deg, #ffffff 300deg 330deg, #000000 330deg 360deg);
-    transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 10px rgba(0,255,0,0.4);
+    transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
-.spinning { box-shadow: 0 0 20px rgba(255,255,0,0.8) !important; }
-.wheel-center { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; background: #222; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid #fff; z-index: 5; }
-.wheel-pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 18px; color: #ff0000; text-shadow: 0 2px 2px #000; z-index: 10; transition: transform 0.1s; }
+.spinning { box-shadow: 0 0 30px #fff !important; }
+.wheel-center { position: absolute; top: 50%; left: 50%; width: 15px; height: 15px; background: #222; border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid #fff; z-index: 5; }
+.wheel-pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 20px; color: #ff0000; z-index: 10; transition: transform 0.1s; text-shadow: 0 1px 2px #000; }
 .tick-anim { transform: translateX(-50%) scale(1.3); color: #ffff00; }
+
 #watcher-frog { width: 50px; height: 40px; background: #66bb6a; border-radius: 50%; border: 2px solid #1b5e20; position: relative; display: flex; justify-content: center; }
 .watcher-eyes { position: absolute; top: -10px; width: 100%; display: flex; justify-content: space-between; padding: 0 4px; }
 .watcher-eye { width: 16px; height: 16px; background: #fff; border: 2px solid #1b5e20; border-radius: 50%; position: relative; }
 .watcher-pupil { width: 6px; height: 6px; background: #000; border-radius: 50%; position: absolute; top: 5px; left: 5px; }
-.mini-mouth { width: 15px; height: 4px; background: #000; border-radius: 5px; position: absolute; bottom: 8px; transition: all 0.2s; }
-#spin-btn { width: 90%; padding: 8px; background: linear-gradient(to bottom, #ff00aa, #aa0077); border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.8rem; cursor: pointer; box-shadow: 0 3px 0 #550033; margin-top: 0px; }
-#spin-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #550033; }
-.instruction { font-size: 0.5rem; color: #88aa88; text-align: center; margin-top: 3px; }
+.mini-mouth { width: 15px; height: 3px; background: #000; border-radius: 5px; position: absolute; bottom: 8px; transition: all 0.2s; }
 
-.lock-section { width: 85%; height: 50px; margin-bottom: 20px; flex-shrink: 0; text-align: center; }
-#slider-track { width: 100%; height: 45px; background: #223322; border-radius: 25px; position: relative; box-shadow: inset 0 0 10px #000; touch-action: none; }
-#slider-text { line-height: 45px; color: #668866; font-size: 0.7rem; font-weight: bold; pointer-events: none; }
-#slider-knob { width: 45px; height: 45px; background: #446644; border-radius: 50%; position: absolute; left: 0; top: 0; cursor: grab; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 10px #000; transition: left 0.1s; }
-#status-msg { margin-top: 2px; font-size: 0.7rem; font-weight: bold; height: 15px; }
+#spin-btn { width: 90%; padding: 12px; background: linear-gradient(to bottom, #ff00aa, #aa0077); border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 0 #550033; }
+#spin-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #550033; }
 
-/* --- STABILIZER OVERLAY (SHAKING) --- */
-#stabilizer-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); z-index: 100;
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    touch-action: none;
-}
-#stab-timer { font-size: 3rem; font-weight: bold; color: #ff0000; margin-bottom: 10px; font-family: monospace; }
-#safe-zone { width: 200px; height: 200px; border: 4px dashed #00ff00; border-radius: 50%; position: absolute; transition: all 0.5s; }
-#fake-cursor { width: 25px; height: 25px; background: #fff; border-radius: 50%; position: absolute; transition: all 0.05s; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-.shake-text { font-size: 2rem; color: #00ff00; margin-bottom: 10px; text-align: center; }
-.stab-msg { color: #fff; margin-top: 250px; text-align: center; font-size: 1rem; }
-.progress-box { width: 200px; height: 10px; background: #112211; margin-top: 10px; border: 1px solid #00ff00; }
-#stop-progress { width: 0%; height: 100%; background: #00ff00; transition: width 0.1s; }
+/* LOCK SLIDER */
+.lock-section { width: 90%; height: 50px; flex-shrink: 0; margin-bottom: 20px; position: relative; z-index: 20; text-align: center; }
+#slider-track { width: 100%; height: 50px; background: #223322; border-radius: 25px; position: relative; box-shadow: inset 0 0 10px #000; touch-action: none; }
+#slider-text { line-height: 50px; color: #668866; font-size: 0.8rem; font-weight: bold; pointer-events: none; }
+#slider-knob { width: 50px; height: 50px; background: #446644; border-radius: 50%; position: absolute; left: 0; top: 0; cursor: grab; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 10px #000; transition: left 0.1s; }
+#status-msg { margin-top: 5px; font-size: 0.8rem; font-weight: bold; height: 20px; }
 
-/* --- WORST COLORS & FLASHING ADS OVERLAY --- */
-@keyframes bgFlash {
-    0% { background: rgba(255, 0, 0, 0.9); }
-    25% { background: rgba(0, 255, 0, 0.9); }
-    50% { background: rgba(0, 0, 255, 0.9); }
-    75% { background: rgba(255, 255, 0, 0.9); }
-    100% { background: rgba(255, 0, 255, 0.9); }
-}
-
+/* --- ADS OVERLAY (THE UGLY PART) --- */
 #ad-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     z-index: 101; display: none; align-items: center; justify-content: center;
-    animation: bgFlash 0.2s infinite; /* Epileptic Flash Warning */
+    /* BG will be handled by body.alarm-active, this is transparent */
+    background: transparent; 
 }
 
-/* UGLY POPUP */
 .ad-popup {
-    width: 280px; height: 350px;
-    background: #ffff00; /* Yellow */
-    color: #ff0000; /* Red Text */
-    border: 10px dashed #00ff00; /* Green Border */
-    border-radius: 0px; /* Sharp corners */
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column; text-align: center; padding: 20px;
-    box-shadow: 10px 10px 0px #0000ff; /* Blue Shadow */
-    font-family: 'Courier New', monospace;
+    width: 300px; height: 350px;
+    background: #ffff00; /* UGLY YELLOW */
+    border: 8px outset #ff0000; /* RED BORDER */
+    display: flex; flex-direction: column; text-align: center; padding: 15px;
+    box-shadow: 10px 10px 0px #000;
+    position: relative;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
-.ad-content h2 { color: #ff00ff; font-size: 2rem; margin-top: 10px; text-transform: uppercase; text-decoration: underline; background: #000; padding: 5px; }
-.ad-content p { font-size: 1.2rem; margin: 15px 0; font-weight: 900; color: #000; background: #00ffff; padding: 10px; }
+.ad-content h2 { color: #ff00ff; font-size: 2rem; margin: 10px 0; background: #000; padding: 5px; transform: rotate(-2deg); }
+.ad-content p { font-size: 1.2rem; color: #0000ff; font-weight: bold; background: #fff; padding: 10px; border: 2px dashed #000; }
+.ad-claim { margin-top: auto; padding: 15px; background: #00ff00; border: 4px solid #000; color: #000; font-size: 1.5rem; font-weight: bold; cursor: pointer; text-transform: uppercase; box-shadow: 5px 5px 0 #880088; }
+.ad-claim:active { transform: translate(5px, 5px); box-shadow: none; }
+#ad-count { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); font-size: 1.5rem; color: #fff; text-shadow: 2px 2px #000; font-weight: bold; background: #000; padding: 5px 10px; }
 
-.ad-claim {
-    margin-top: auto; padding: 15px;
-    background: linear-gradient(45deg, #ff0000, #0000ff);
-    border: 5px solid #ff00ff;
-    font-weight: bold; cursor: pointer; font-size: 1.5rem;
-    color: #ffff00; text-shadow: 2px 2px #000;
-}
-
-#ad-count {
-    color: #fff; position: absolute; bottom: 20px;
-    font-family: monospace; font-size: 1.5rem;
-    background: #000; padding: 5px; border: 2px solid #fff;
-}
-
-/* RUNNING BUTTON (UGLY EDITION) */
 .close-ad {
-    position: absolute; top: 5px; right: 5px;
-    width: 50px; height: 50px;
-    background: #00ffff; /* Cyan */
-    border: 5px dotted #ff0000; /* Red Border */
-    border-radius: 0%; /* Square */
-    color: #000; font-weight: 900; font-size: 30px;
+    position: absolute; top: -15px; right: -15px; width: 50px; height: 50px;
+    background: #00ffff; border: 4px solid #000; border-radius: 50%;
+    color: #000; font-size: 30px; font-weight: bold;
     display: flex; justify-content: center; align-items: center;
-    cursor: crosshair; transition: top 0.1s, left 0.1s;
-    z-index: 99999; box-shadow: 5px 5px 0 #000;
+    cursor: crosshair; z-index: 99999;
+    box-shadow: 5px 5px 0 rgba(0,0,0,0.5);
 }
 .running-mode { position: fixed !important; }
 
-@media (max-width: 600px) {
-    body { justify-content: flex-start; }
-    header { margin-top: 5px; transform: scale(0.85); margin-bottom: 0; }
-    .main-wrapper { flex-direction: column; gap: 0; transform: scale(0.68); transform-origin: top center; width: 100%; height: 0; margin-bottom: 500px; }
-    .panel { margin-bottom: 10px; }
-    .lock-section { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%) scale(0.9); width: 100%; }
-}
+/* STABILIZER OVERLAY */
+#stabilizer-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; touch-action: none; }
+#stab-timer { font-size: 4rem; font-weight: bold; color: #ff0000; font-family: monospace; }
+#safe-zone { width: 200px; height: 200px; border: 5px dashed #00ff00; border-radius: 50%; position: absolute; transition: all 0.5s; }
+#fake-cursor { width: 30px; height: 30px; background: #fff; border-radius: 50%; position: absolute; transition: all 0.05s; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.shake-text { font-size: 2.5rem; color: #00ff00; margin-bottom: 20px; }
+.stab-msg { color: #fff; margin-top: 280px; font-size: 1.2rem; }
+.progress-box { width: 250px; height: 15px; background: #333; margin-top: 15px; border: 2px solid #fff; }
+#stop-progress { width: 0%; height: 100%; background: #00ff00; }

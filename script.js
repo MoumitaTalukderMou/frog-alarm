@@ -1,4 +1,4 @@
-// --- BASE VARIABLES ---
+// --- VARIABLES ---
 let totalMinutes = 720;
 let leakRate = 0.5;
 let isLocked = false;
@@ -8,7 +8,7 @@ let checkInterval;
 let isJammed = false;
 let jamClicksRemaining = 0;
 
-// VOLUME WHEEL VARIABLES
+// VOLUME WHEEL
 let currentVol = 0; 
 let isSpinning = false;
 const wheel = document.getElementById('vol-wheel');
@@ -17,7 +17,7 @@ const volBar = document.getElementById('vol-bar');
 const frogMouth = document.getElementById('frog-mouth');
 const wheelPointer = document.getElementById('wheel-pointer');
 
-// --- ALARM VARIABLES ---
+// ALARM
 let isRinging = false;
 let alarmOsc = null;
 let sirenInterval = null;
@@ -25,18 +25,18 @@ let stability = 0;
 let stabCountdown = 15;
 let stabInterval = null;
 
-// --- AD VARIABLES ---
+// ADS
 let adsRemaining = 5;
 let jumpsRemaining = 0;
 const adData = [
-    { title: "IPHONE 15 PRO!!", body: "You have won a free iPhone! Just pay 10 Taka shipping!" },
-    { title: "VIRUS DETECTED!", body: "Your phone has 14 viruses! Download 'Super Cleaner' now!" },
-    { title: "10,000 TK CASH", body: "bKash reward waiting for you! Enter your PIN (not really)!" },
     { title: "FREE FLIES!!", body: "Fresh yummy flies nearby! 50% Discount for Frogs!" },
-    { title: "BATTERY DYING", body: "Your battery is at 1%. Click to download more battery!" }
+    { title: "IPHONE 15!!", body: "You have won a free iPhone! Just pay 10 Taka!" },
+    { title: "VIRUS ALERT!", body: "Your phone has 99 viruses! Clean NOW!" },
+    { title: "CASH REWARD", body: "10,000 TK waiting for you! Click here!" },
+    { title: "BATTERY LOW", body: "Battery at 1%. Download more RAM!" }
 ];
 
-// --- DOM ELEMENTS ---
+// DOM
 const dTime = document.getElementById('d-time');
 const amPm = document.getElementById('am-pm');
 const pumpHandle = document.getElementById('pump-handle');
@@ -51,14 +51,14 @@ const fakeCursor = document.getElementById('fake-cursor');
 const progressBar = document.getElementById('stop-progress');
 const stabTimerDisplay = document.getElementById('stab-timer');
 
-// AUDIO INIT
+// AUDIO
 let audioCtx = null;
 function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
-// --- MAIN LOOP ---
+// MAIN LOOP
 setInterval(() => {
     if(isLocked) return;
     if(!isFrozen && totalMinutes > 0) {
@@ -69,10 +69,12 @@ setInterval(() => {
     }
 }, 50);
 
-// --- PUMP LOGIC ---
+// PUMP
 function pumpTime(e) {
     initAudio();
     if(isLocked) return;
+    const pumpInd = document.getElementById('pump-indicator');
+    
     if(isJammed) {
         jamClicksRemaining--;
         pumpHandle.classList.add('pump-shake');
@@ -80,9 +82,7 @@ function pumpTime(e) {
         if(jamClicksRemaining <= 0) {
             isJammed = false;
             pumpHandle.parentElement.classList.remove('pump-jammed');
-            document.getElementById('pump-indicator').innerText = "OK";
-            document.getElementById('pump-indicator').style.color = "#0f0";
-            document.getElementById('pump-indicator').style.background = "transparent";
+            pumpInd.innerText = "OK"; pumpInd.style.color = "#0f0"; pumpInd.style.background = "transparent";
         }
         return;
     }
@@ -90,9 +90,7 @@ function pumpTime(e) {
         isJammed = true;
         jamClicksRemaining = 4;
         pumpHandle.parentElement.classList.add('pump-jammed');
-        document.getElementById('pump-indicator').innerText = "JAMMED!";
-        document.getElementById('pump-indicator').style.color = "#fff";
-        document.getElementById('pump-indicator').style.background = "#f00";
+        pumpInd.innerText = "JAMMED!"; pumpInd.style.color = "#fff"; pumpInd.style.background = "#f00";
         return;
     }
     pumpHandle.classList.add('pump-active');
@@ -103,58 +101,43 @@ function pumpTime(e) {
     updateClockUI();
     
     if(audioCtx) {
-        let o = audioCtx.createOscillator();
-        let g = audioCtx.createGain();
-        o.frequency.value = 100; o.type='triangle';
-        o.connect(g); g.connect(audioCtx.destination);
+        let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
+        o.frequency.value = 100; o.type='triangle'; o.connect(g); g.connect(audioCtx.destination);
         o.start(); o.stop(audioCtx.currentTime + 0.1);
     }
 }
 pumpHandle.addEventListener('touchstart', (e) => { e.preventDefault(); pumpTime(); });
 pumpHandle.addEventListener('mousedown', (e) => { pumpTime(); });
 
-// --- FREEZE LOGIC ---
+// FREEZE
 function freezeTime() {
     initAudio();
     if(isLocked || isFrozen) return;
     isFrozen = true;
-    freezeBtn.disabled = true;
-    freezeBtn.style.backgroundColor = "#fff";
-    freezeBtn.innerText = "FROZEN!";
+    freezeBtn.disabled = true; freezeBtn.style.backgroundColor = "#fff"; freezeBtn.innerText = "FROZEN!";
     let countdown = 5;
     let timer = setInterval(() => {
-        countdown--;
-        freezeBtn.innerText = `FROZEN (${countdown}s)`;
+        countdown--; freezeBtn.innerText = `FROZEN (${countdown}s)`;
         if(countdown <= 0) {
-            clearInterval(timer);
-            isFrozen = false;
-            freezeBtn.disabled = false;
-            freezeBtn.style.backgroundColor = "#00ccff";
-            freezeBtn.innerText = "❄ FREEZE ❄";
+            clearInterval(timer); isFrozen = false;
+            freezeBtn.disabled = false; freezeBtn.style.backgroundColor = "#00ccff"; freezeBtn.innerText = "❄ FREEZE ❄";
         }
     }, 1000);
 }
 function updateClockUI() {
     let m = Math.floor(totalMinutes);
-    let h24 = Math.floor(m / 60);
-    let mins = m % 60;
-    let hDeg = (h24 % 12 * 30) + (mins * 0.5); 
-    let mDeg = mins * 6; 
-    hHand.style.transform = `rotate(${hDeg}deg)`;
-    mHand.style.transform = `rotate(${mDeg}deg)`;
-    let h12 = h24 % 12; if(h12 === 0) h12 = 12;
-    let ap = h24 < 12 ? 'AM' : 'PM';
-    dTime.innerText = `${h12}:${mins.toString().padStart(2,'0')}`;
-    amPm.innerText = ap;
+    let h24 = Math.floor(m / 60); let mins = m % 60;
+    let hDeg = (h24 % 12 * 30) + (mins * 0.5); let mDeg = mins * 6; 
+    hHand.style.transform = `rotate(${hDeg}deg)`; mHand.style.transform = `rotate(${mDeg}deg)`;
+    let h12 = h24 % 12; if(h12 === 0) h12 = 12; let ap = h24 < 12 ? 'AM' : 'PM';
+    dTime.innerText = `${h12}:${mins.toString().padStart(2,'0')}`; amPm.innerText = ap;
 }
 
-// --- WHEEL ---
+// WHEEL
 function spinWheel() {
     if(isLocked || isSpinning) return;
-    initAudio();
-    isSpinning = true;
-    wheel.classList.add('spinning'); 
-    volStatus.innerText = "SPINNING...";
+    initAudio(); isSpinning = true;
+    wheel.classList.add('spinning'); volStatus.innerText = "SPINNING...";
     let deg = Math.floor(720 + Math.random() * 360);
     wheel.style.transform = `rotate(${deg}deg)`;
     
@@ -164,17 +147,14 @@ function spinWheel() {
         wheelPointer.classList.add('tick-anim');
         setTimeout(()=> wheelPointer.classList.remove('tick-anim'), 100);
         if(audioCtx) {
-            let o = audioCtx.createOscillator();
-            let g = audioCtx.createGain();
-            o.type = 'triangle'; o.frequency.value = 800;
-            g.gain.value = 0.1; o.connect(g); g.connect(audioCtx.destination);
-            o.start(); o.stop(audioCtx.currentTime + 0.05);
+            let o = audioCtx.createOscillator(); let g = audioCtx.createGain();
+            o.type = 'triangle'; o.frequency.value = 800; g.gain.value = 0.1;
+            o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.05);
         }
     }, 150);
 
     setTimeout(() => {
-        isSpinning = false;
-        wheel.classList.remove('spinning');
+        isSpinning = false; wheel.classList.remove('spinning');
         currentVol = Math.floor(Math.random() * 100);
         volBar.style.width = currentVol + "%";
         if(currentVol < 20) {
@@ -190,7 +170,7 @@ function spinWheel() {
     }, 3000); 
 }
 
-// --- LOCK ---
+// LOCK
 let draggingSlider = false;
 sliderKnob.addEventListener('mousedown', () => draggingSlider = true);
 sliderKnob.addEventListener('touchstart', (e) => { e.preventDefault(); draggingSlider = true; });
@@ -204,8 +184,7 @@ function handleSlider(cx) {
         let rect = sliderTrack.getBoundingClientRect();
         let x = cx - rect.left;
         let limit = rect.width - 50; 
-        if(x > limit) attemptLock();
-        else if(x >= 0) sliderKnob.style.left = x + 'px';
+        if(x > limit) attemptLock(); else if(x >= 0) sliderKnob.style.left = x + 'px';
     }
 }
 function attemptLock() {
@@ -233,24 +212,34 @@ function checkRealTime() {
     }
 }
 
-// --- ALARM ---
+// --- ALARM LOGIC (MODIFIED FOR HORROR) ---
 function triggerAlarm() {
     clearInterval(checkInterval);
     isRinging = true;
-    document.getElementById('stabilizer-overlay').style.display = 'flex';
+    
+    // START UGLY MODE
+    document.body.classList.add('alarm-active');
     document.body.classList.add('shaking');
+    
+    document.getElementById('stabilizer-overlay').style.display = 'flex';
     stability = 0; stabCountdown = 15; adsRemaining = 5; 
     progressBar.style.width = "0%";
     stabTimerDisplay.innerText = stabCountdown;
+    
     initAudio();
     playHorribleAlarm();
     moveSafeZone();
+    
     if(stabInterval) clearInterval(stabInterval);
     stabInterval = setInterval(() => {
         stabCountdown--;
         stabTimerDisplay.innerText = stabCountdown;
         if(stabCountdown <= 5) stabTimerDisplay.style.color = "red";
-        if(stabCountdown <= 0) { clearInterval(stabInterval); failStabilizer(); }
+        
+        if(stabCountdown <= 0) {
+            clearInterval(stabInterval);
+            failStabilizer(); 
+        }
     }, 1000);
 }
 
@@ -263,7 +252,9 @@ function playHorribleAlarm() {
     gain.gain.value = 0.8; 
     osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
     osc1.start(); osc2.start();
+    
     alarmOsc = { stop: () => { osc1.stop(); osc2.stop(); clearInterval(sirenInterval); } };
+    
     let high = false;
     sirenInterval = setInterval(() => {
         high = !high;
@@ -273,6 +264,7 @@ function playHorribleAlarm() {
     }, 300);
 }
 
+// STABILIZER
 function moveSafeZone() {
     setInterval(() => {
         let maxW = window.innerWidth - 150; let maxH = window.innerHeight - 150;
@@ -296,9 +288,15 @@ function runStabilizer(clientX, clientY) {
     if(stability >= 100) { clearInterval(stabInterval); stopAlarmTotally(); }
 }
 
-function failStabilizer() { document.getElementById('stabilizer-overlay').style.display = 'none'; startAdsLevel(); }
+function failStabilizer() {
+    document.getElementById('stabilizer-overlay').style.display = 'none';
+    startAdsLevel();
+}
 
-function startAdsLevel() { document.getElementById('ad-overlay').style.display = 'flex'; setupNextAd(); }
+function startAdsLevel() {
+    document.getElementById('ad-overlay').style.display = 'flex';
+    setupNextAd();
+}
 
 function setupNextAd() {
     const data = adData[5 - adsRemaining];
@@ -307,14 +305,16 @@ function setupNextAd() {
         document.getElementById('ad-body').innerText = data.body;
     }
     document.getElementById('ad-count').innerText = `Ads remaining: ${adsRemaining}`;
+    
     const closeBtn = document.querySelector('.close-ad');
     const popup = document.getElementById('current-ad');
     if(closeBtn.parentNode !== popup) popup.appendChild(closeBtn);
+    
     closeBtn.classList.remove('running-mode'); 
-    closeBtn.style.position = 'absolute'; closeBtn.style.top = '5px'; closeBtn.style.right = '5px';
-    closeBtn.style.left = 'auto'; closeBtn.style.background = '#00ffff'; 
-    closeBtn.innerText = "×"; closeBtn.style.border = '5px dotted #ff0000';
+    closeBtn.style.position = 'absolute'; closeBtn.style.top = '-15px'; closeBtn.style.right = '-15px';
+    closeBtn.style.left = 'auto'; 
     jumpsRemaining = Math.floor(Math.random() * 4) + 3; 
+    
     const newBtn = closeBtn.cloneNode(true);
     closeBtn.parentNode.replaceChild(newBtn, closeBtn);
     newBtn.addEventListener('mouseover', runButtonRun);
@@ -332,7 +332,7 @@ function runButtonRun() {
         let newX = Math.floor(Math.random() * maxX); let newY = Math.floor(Math.random() * maxY);
         btn.style.left = newX + 'px'; btn.style.top = newY + 'px'; btn.style.right = 'auto'; 
         jumpsRemaining--;
-        if(jumpsRemaining === 0) { btn.style.background = '#00ff00'; btn.style.border = '3px solid #000'; btn.style.color = '#000'; btn.innerText = "OK"; }
+        if(jumpsRemaining === 0) { btn.style.background = '#00ff00'; btn.style.border = '4px solid #000'; btn.innerText = "OK"; }
     }
 }
 
@@ -349,7 +349,18 @@ function closeAd() {
     if(jumpsRemaining > 0) return;
     adsRemaining--;
     if (adsRemaining <= 0) { stopAlarmTotally(); } 
-    else { setupNextAd(); const popup = document.getElementById('current-ad'); popup.style.transform = `scale(0.1)`; setTimeout(() => { popup.style.transform = `scale(1)`; }, 100); }
+    else { 
+        setupNextAd(); 
+        const popup = document.getElementById('current-ad');
+        popup.style.transform = `scale(0.1)`; 
+        setTimeout(() => { popup.style.transform = `scale(1)`; }, 100); 
+    }
 }
 
-function stopAlarmTotally() { if(alarmOsc) alarmOsc.stop(); alert("GOOD MORNING! Alarm Deactivated."); location.reload(); }
+function stopAlarmTotally() {
+    if(alarmOsc) alarmOsc.stop();
+    document.body.classList.remove('alarm-active'); // Remove Ugly Mode
+    document.body.classList.remove('shaking');
+    alert("GOOD MORNING! Alarm Deactivated.");
+    location.reload();
+}
